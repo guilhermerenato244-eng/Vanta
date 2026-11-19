@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VANTA — Central tática</title>
+<meta name="theme-color" content="#0b0f15">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VANTA">
+<style>
+:root{--bg:#0b0f15;--bg2:#10161f;--panel:rgba(22,30,42,.72);--line:#243042;--line2:#34445c;--txt:#e6ebf2;--mut:#8593a6;--blue:#3b8cff;--blue2:#7db4ff;--amb:#ff8a1f;--ok:#37d67a;--bad:#ff5a52;
+--f:"Bahnschrift","Rajdhani","Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);--nav:64px;--cut:12px}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--f);font-size:16px;line-height:1.35;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--amb);outline-offset:2px}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{height:100%;display:grid;grid-template-rows:1fr auto;background:radial-gradient(120% 60% at 50% -10%,#16233a 0,transparent 60%),var(--bg)}
+main{overflow-y:auto;overflow-x:hidden;padding:calc(var(--sat) + 14px) calc(var(--sar) + 16px) 24px calc(var(--sal) + 16px);-webkit-overflow-scrolling:touch}
+.view{display:none;max-width:980px;margin:0 auto}.view.on{display:block;animation:in .22s ease-out}
+@keyframes in{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+h1{font-size:30px;font-weight:700;letter-spacing:.5px;line-height:1.05}
+h2{font-size:20px;font-weight:700;letter-spacing:.3px;margin:22px 0 10px}
+.mut{color:var(--mut)}.sm{font-size:14px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:22px;letter-spacing:3px}
+.brand svg{width:30px;height:30px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;font-size:14px;border:1px solid var(--line2);background:rgba(16,22,31,.7);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(55,214,122,.6);animation:pulse 2s infinite}
+.dot.busy{background:var(--amb);animation:none}.dot.off{background:#566274;animation:none}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(55,214,122,0)}100%{box-shadow:0 0 0 0 rgba(55,214,122,0)}}
+.card{position:relative;padding:16px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,var(--cut) 100%,0 calc(100% - var(--cut)));box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.card::before{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:var(--blue)}
+.card.amb::before{background:var(--amb)}
+.hero{display:grid;gap:18px;padding:20px 18px 20px 22px;overflow:hidden}
+.radar{width:min(70vw,260px);aspect-ratio:1;justify-self:center;position:relative}
+.radar svg{width:100%;height:100%}
+.sweep{position:absolute;inset:6%;border-radius:50%;background:conic-gradient(from 0deg,rgba(59,140,255,0) 0,rgba(59,140,255,.0) 70%,rgba(59,140,255,.45) 100%);animation:spin 4s linear infinite;-webkit-mask:radial-gradient(circle,#000 62%,transparent 63%);mask:radial-gradient(circle,#000 62%,transparent 63%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.blip{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--amb);box-shadow:0 0 10px var(--amb)}
+.cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;font-size:20px;font-weight:700;letter-spacing:1.5px;color:#0b0f15;background:linear-gradient(180deg,#ffa447,var(--amb));clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));transition:transform .12s,filter .12s}
+.cta:active{transform:scale(.97);filter:brightness(.9)}
+.cta.run{background:linear-gradient(180deg,#5aa3ff,var(--blue))}
+.grid{display:grid;gap:12px}.g2{grid-template-columns:1fr 1fr}
+.modes{display:grid;gap:10px}
+.mode{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 16px;width:100%;border:1px solid var(--line);background:rgba(16,22,31,.6);transition:border-color .15s,background .15s,transform .12s;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.mode:active{transform:scale(.98)}
+.mode[aria-pressed=true]{border-color:var(--blue);background:rgba(59,140,255,.12)}
+.mode b{display:block;font-size:18px}
+.mode .chk{margin-left:auto;width:20px;height:20px;border:2px solid var(--line2);border-radius:50%;transition:.15s}
+.mode[aria-pressed=true] .chk{border-color:var(--blue);background:radial-gradient(circle,var(--blue) 45%,transparent 50%)}
+.stat b{display:block;font-size:34px;line-height:1;font-weight:700}
+.stat span{color:var(--mut);font-size:14px}
+.up{color:var(--ok)}.dn{color:var(--bad)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:10px}
+.bars i{flex:1;background:linear-gradient(180deg,var(--blue2),var(--blue));height:var(--h);transform-origin:bottom;animation:grow .5s ease-out both;position:relative}
+.bars i.t{background:linear-gradient(180deg,#ffb066,var(--amb))}
+@keyframes grow{from{transform:scaleY(0)}}
+.days{display:flex;gap:8px;color:var(--mut);font-size:13px;margin-top:6px}.days span{flex:1;text-align:center}
+.ring{--p:61;width:96px;aspect-ratio:1;border-radius:50%;background:conic-gradient(var(--amb) calc(var(--p)*1%),#1c2636 0);display:grid;place-items:center;position:relative}
+.ring::after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--bg2)}
+.ring b{position:relative;z-index:1;font-size:24px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.row .grow{flex:1;min-width:0}.row b{display:block}
+.tag{padding:2px 10px;font-size:13px;font-weight:700;border:1px solid}
+.tag.w{color:var(--ok)}.tag.l{color:var(--bad)}
+.av{width:42px;height:42px;display:grid;place-items:center;font-weight:700;font-size:18px;background:#1a2535;border:1px solid var(--line2);position:relative;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}
+.av .dot{position:absolute;right:3px;bottom:3px;width:8px;height:8px}
+.set{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);min-height:60px}
+.set:last-child{border:0}.set .grow{flex:1}.set b{display:block}
+.sw{width:52px;height:30px;background:#1c2636;border:1px solid var(--line2);position:relative;flex:none;transition:.2s;border-radius:15px}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#8593a6;transition:.2s}
+.sw[aria-checked=true]{background:rgba(59,140,255,.35);border-color:var(--blue)}
+.sw[aria-checked=true]::after{left:25px;background:var(--blue2)}
+input[type=range]{width:100%;accent-color:var(--amb);height:32px}
+nav{display:flex;padding:6px calc(var(--sar) + 8px) calc(var(--sab) + 6px) calc(var(--sal) + 8px);background:rgba(11,15,21,.92);border-top:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+nav button{flex:1;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--mut);font-size:13px;position:relative;transition:color .15s}
+nav button[aria-current=page]{color:var(--txt)}
+nav button[aria-current=page]::before{content:"";position:absolute;top:-7px;width:34px;height:3px;background:var(--amb)}
+nav button[aria-current=page] svg{color:var(--blue2)}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav) + var(--sab) + 18px);transform:translate(-50%,20px);padding:10px 18px;background:#16202e;border:1px solid var(--blue);opacity:0;pointer-events:none;transition:.25s;z-index:9;font-size:15px}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+#splash{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg);transition:opacity .45s,visibility .45s}
+#splash.out{opacity:0;visibility:hidden}
+#splash .lg{display:grid;justify-items:center;gap:14px}
+#splash svg{width:84px;height:84px;animation:pop .7s cubic-bezier(.2,.9,.3,1.2) both}
+#splash b{letter-spacing:8px;font-size:26px}
+#splash i{display:block;width:140px;height:3px;background:#1c2636;overflow:hidden}
+#splash i::after{content:"";display:block;height:100%;width:40%;background:var(--amb);animation:ld 1s ease-in-out infinite}
+@keyframes pop{from{opacity:0;transform:scale(.7)}}@keyframes ld{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
+@media (min-width:700px){.g3{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr auto;align-items:center}.modes{grid-template-columns:repeat(3,1fr)}.dash{grid-template-columns:2fr 1fr}}
+@media (min-width:900px){
+.app{grid-template-rows:1fr;grid-template-columns:230px 1fr}
+nav{order:-1;flex-direction:column;justify-content:flex-start;gap:4px;padding:calc(var(--sat) + 22px) 14px 20px calc(var(--sal) + 14px);border:0;border-right:1px solid var(--line);position:relative}
+nav::before{content:"VANTA";font-weight:700;letter-spacing:5px;font-size:22px;padding:0 12px 18px}
+nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:14px;padding:0 14px;font-size:17px;min-height:48px}
+nav button[aria-current=page]{background:rgba(59,140,255,.12)}
+nav button[aria-current=page]::before{top:0;left:0;width:3px;height:100%}
+.toast{bottom:24px;left:calc(50% + 115px)}
+}
+@media (orientation:landscape) and (max-height:480px) and (max-width:899px){
+.app{grid-template-rows:1fr;grid-template-columns:auto 1fr}
+nav{order:-1;flex-direction:column;border:0;border-right:1px solid var(--line);padding:6px calc(var(--sal) + 6px)}
+nav button{min-height:44px;font-size:11px;padding:0 10px}
+nav button[aria-current=page]::before{top:0;left:-6px;width:3px;height:100%}
+.hero{grid-template-columns:1fr auto}.radar{width:150px}.modes{grid-template-columns:repeat(3,1fr)}h1{font-size:24px}
+}
+.lite *,.lite *::before,.lite *::after{animation:none!important;transition:none!important}
+.lite .card,.lite nav{backdrop-filter:none;-webkit-backdrop-filter:none}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="logo" viewBox="0 0 512 512"><path d="M96 130h118l42 150 42-150h118L316 400h-120z" fill="#3b8cff"/><path d="M226 130h60l-30 100z" fill="#0b0f15"/><path d="M256 300l24 60h-48z" fill="#ff8a1f"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></symbol>
+<symbol id="i-dash" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M21 20H3"/></symbol>
+<symbol id="i-squad" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M16 5.5a3 3 0 010 5.8M18 14.3c2 .7 3.5 2.6 3.5 5.7"/></symbol>
+<symbol id="i-set" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+</defs></svg>
+
+<div id="splash"><div class="lg"><svg><use href="#logo"/></svg><b>VANTA</b><i></i></div></div>
+
+<div class="app">
+<main id="main">
+
+<section class="view on" id="v-home" aria-label="Início">
+  <div class="top"><div class="brand"><svg><use href="#logo"/></svg>VANTA</div>
+    <span class="pill"><span class="dot"></span><span id="ping">Servidor online · 24 ms</span></span></div>
+  <div class="card hero">
+    <div>
+      <p class="mut sm">Temporada 7 · Divisão Ouro II</p>
+      <h1>Pronto para a próxima rodada, Operador?</h1>
+      <p class="mut" style="margin:10px 0 16px">Esquadrão completo: 3 de 5 online. A fila média está em 0:42.</p>
+      <button class="cta" id="queue"><svg class="i"><use href="#i-play"/></svg><span>Entrar na fila</span></button>
+    </div>
+    <div class="radar" aria-hidden="true">
+      <svg viewBox="0 0 200 200" fill="none" stroke="#2b3b54" stroke-width="1"><circle cx="100" cy="100" r="94"/><circle cx="100" cy="100" r="64"/><circle cx="100" cy="100" r="34"/><path d="M100 6v188M6 100h188" stroke="#1f2c40"/><path d="M100 100l44-44" stroke="#3b8cff" stroke-width="1.5"/></svg>
+      <div class="sweep"></div>
+      <span class="blip" style="left:64%;top:30%"></span><span class="blip" style="left:28%;top:62%;opacity:.6"></span>
+    </div>
+  </div>
+  <h2>Modo de jogo</h2>
+  <div class="modes" id="modes">
+    <button class="mode" aria-pressed="true" data-m="Competitivo"><span><b>Competitivo</b><span class="mut sm">5v5 · rodadas ranqueadas</span></span><span class="chk"></span></button>
+    <button class="mode" aria-pressed="false" data-m="Treino"><span><b>Treino tático</b><span class="mut sm">Bots · sem pontuação</span></span><span class="chk"></span></button>
+    <button class="mode" aria-pressed="false" data-m="Casual"><span><b>Casual</b><span class="mut sm">10v10 · partidas rápidas</span></span><span class="chk"></span></button>
+  </div>
+  <h2>Última atualização</h2>
+  <div class="card amb"><b>Mapa novo em rotação: Estaleiro</b><p class="mut sm" style="margin-top:4px">Três rotas, dois pontos de plantio e uma passagem lateral que só abre após o primeiro round.</p></div>
+</section>
+
+<section class="view" id="v-dash" aria-label="Painel">
+  <h1>Painel</h1><p class="mut">Seus últimos 7 dias</p>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card stat"><span>Abates / mortes</span><b data-n="1.42" data-d="2">0</b><span class="up">▲ 0,08 na semana</span></div>
+    <div class="card stat"><span>Precisão</span><b data-n="38" data-s="%">0</b><span class="dn">▼ 1% na semana</span></div>
+    <div class="card stat amb"><span>Rodadas jogadas</span><b data-n="284">0</b><span class="mut">19 partidas</span></div>
+    <div class="card stat"><span>Tempo médio de reação</span><b data-n="212" data-s=" ms">0</b><span class="up">▲ 9 ms mais rápido</span></div>
+  </div>
+  <div class="grid dash" style="margin-top:12px">
+    <div class="card"><b>Abates por dia</b>
+      <div class="bars"><i style="--h:45%"></i><i style="--h:70%"></i><i style="--h:35%"></i><i style="--h:88%" class="t"></i><i style="--h:60%"></i><i style="--h:52%"></i><i style="--h:76%"></i></div>
+      <div class="days"><span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span><span>dom</span></div></div>
+    <div class="card" style="display:flex;align-items:center;gap:16px"><div class="ring" style="--p:61"><b>61%</b></div><div><b>Vitórias</b><p class="mut sm">12 vitórias em 19 partidas</p></div></div>
+  </div>
+  <h2>Partidas recentes</h2>
+  <div class="card">
+    <div class="row"><span class="tag w">V</span><div class="grow"><b>Estaleiro</b><span class="mut sm">Competitivo · 16–11</span></div><span>24/14</span></div>
+    <div class="row"><span class="tag l">D</span><div class="grow"><b>Refinaria</b><span class="mut sm">Competitivo · 9–16</span></div><span>13/18</span></div>
+    <div class="row"><span class="tag w">V</span><div class="grow"><b>Terminal Norte</b><span class="mut sm">Competitivo · 16–7</span></div><span>21/9</span></div>
+  </div>
+</section>
+
+<section class="view" id="v-squad" aria-label="Esquadrão">
+  <h1>Esquadrão</h1><p class="mut">3 online · 1 em partida · 1 offline</p>
+  <div class="card" style="margin-top:14px">
+    <div class="row"><div class="av">K<span class="dot"></span></div><div class="grow"><b>Kaian</b><span class="mut sm">No lobby</span></div><button class="pill">Convidar</button></div>
+    <div class="row"><div class="av">R<span class="dot"></span></div><div class="grow"><b>Rhaz</b><span class="mut sm">No lobby</span></div><button class="pill">Convidar</button></div>
+    <div class="row"><div class="av">M<span class="dot busy"></span></div><div class="grow"><b>Mirela</b><span class="mut sm">Em partida · rodada 14</span></div><span class="mut sm">Ocupada</span></div>
+    <div class="row"><div class="av">T<span class="dot"></span></div><div class="grow"><b>Tobias</b><span class="mut sm">No lobby</span></div><button class="pill">Convidar</button></div>
+    <div class="row"><div class="av">N<span class="dot off"></span></div><div class="grow"><b>Nuvem</b><span class="mut sm">Offline há 2 h</span></div><span class="mut sm">Offline</span></div>
+  </div>
+</section>
+
+<section class="view" id="v-set" aria-label="Configurações">
+  <h1>Configurações</h1><p class="mut">As escolhas ficam salvas neste aparelho.</p>
+  <div class="card" style="margin-top:14px">
+    <div class="set"><div class="grow"><b>Modo leve</b><span class="mut sm">Desliga animações e desfoque. Economiza bateria.</span></div><button class="sw" role="switch" aria-checked="false" aria-label="Modo leve" data-k="lite"></button></div>
+    <div class="set"><div class="grow"><b>Vibração</b><span class="mut sm">Resposta tátil ao tocar nos botões.</span></div><button class="sw" role="switch" aria-checked="true" aria-label="Vibração" data-k="vib"></button></div>
+    <div class="set"><div class="grow"><b>Alertas do esquadrão</b><span class="mut sm">Aviso quando alguém entrar no lobby.</span></div><button class="sw" role="switch" aria-checked="true" aria-label="Alertas do esquadrão" data-k="alert"></button></div>
+    <div class="set" style="display:block"><b>Tamanho do texto: <span id="fsv">100</span>%</b><input type="range" id="fs" min="90" max="130" step="5" value="100" aria-label="Tamanho do texto"></div>
+  </div>
+  <h2>Instalar no celular</h2>
+  <div class="card amb"><p class="mut sm" id="inst">No Android, toque em Instalar. No iPhone, abra no Safari, toque em Compartilhar e depois em Adicionar à Tela de Início.</p>
+    <button class="cta" id="ib" style="margin-top:12px;min-height:50px;font-size:18px">Instalar o app</button>
+    <button class="pill" id="fsb" style="margin-top:10px">Tela cheia</button></div>
+  <p class="mut sm" style="margin-top:16px;text-align:center">VANTA 1.0 · funciona offline após o primeiro acesso</p>
+</section>
+
+</main>
+<nav id="nav" aria-label="Navegação principal">
+  <button data-t="home" aria-current="page"><svg class="i"><use href="#i-home"/></svg>Início</button>
+  <button data-t="dash"><svg class="i"><use href="#i-dash"/></svg>Painel</button>
+  <button data-t="squad"><svg class="i"><use href="#i-squad"/></svg>Esquadrão</button>
+  <button data-t="set"><svg class="i"><use href="#i-set"/></svg>Ajustes</button>
+</nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const T=['home','dash','squad','set'];let cur=0;
+let S={lite:false,vib:true,alert:true,fs:100};
+try{Object.assign(S,JSON.parse(localStorage.getItem('vanta')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('vanta',JSON.stringify(S))}catch(e){}};
+const buzz=n=>{if(S.vib&&navigator.vibrate)navigator.vibrate(n||12)};
+let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200)};
+function go(i){if(i<0||i>=T.length||i===cur&&$('#v-'+T[i]).classList.contains('on'))return;cur=i;
+ $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+T[i]));
+ $$('#nav button').forEach
